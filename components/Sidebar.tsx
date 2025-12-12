@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ViewState, Language } from '../types';
 import { getTranslation } from '../translations';
-import { LayoutDashboard, Wrench, MessageSquare, Power, ArrowLeft, Sun, Moon, Globe } from 'lucide-react';
+import { LayoutDashboard, Wrench, MessageSquare, Power, ArrowLeft, Sun, Moon, Globe, Download } from 'lucide-react';
 
 interface SidebarProps {
   currentView: ViewState;
@@ -23,7 +23,32 @@ const Sidebar: React.FC<SidebarProps> = ({
   onToggleLang
 }) => {
   const [showBrightness, setShowBrightness] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const t = getTranslation(lang).sidebar;
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    // Show the install prompt
+    deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+    // We've used the prompt, and can't use it again, throw it away
+    setDeferredPrompt(null);
+  };
 
   const navItems = [
     { view: ViewState.DASHBOARD, icon: LayoutDashboard, label: t.dash },
@@ -79,6 +104,17 @@ const Sidebar: React.FC<SidebarProps> = ({
       ))}
 
       <div className="mt-auto flex flex-col gap-2 md:gap-4">
+        {/* Install Button - Only visible if supported/promptable */}
+        {deferredPrompt && (
+          <button 
+              onClick={handleInstallClick}
+              className="flex flex-col items-center justify-center w-14 md:w-16 h-10 md:h-12 rounded-2xl text-emerald-400 hover:bg-slate-800 hover:text-emerald-300 transition-colors animate-pulse"
+            >
+              <Download size={20} strokeWidth={1.5} className="md:w-[24px] md:h-[24px]" />
+              <span className="text-[9px] md:text-[10px] mt-1 font-medium">{t.install}</span>
+          </button>
+        )}
+
         {/* Language Toggle */}
         <button 
             onClick={onToggleLang}

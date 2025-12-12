@@ -9,7 +9,8 @@ export const translations = {
       exit: 'Exit',
       dim: 'Dim',
       back: 'Back',
-      lang: 'Lang'
+      lang: 'Lang',
+      install: 'Install'
     },
     dashboard: {
       currentSpeed: 'Current Speed',
@@ -57,7 +58,8 @@ export const translations = {
       exit: '離開',
       dim: '亮度',
       back: '返回',
-      lang: '語言'
+      lang: '語言',
+      install: '安裝'
     },
     dashboard: {
       currentSpeed: '目前時速',
