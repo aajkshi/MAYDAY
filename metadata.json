@@ -1,0 +1,8 @@
+{
+  "name": "ApplePie AutoHub",
+  "description": "A driver-focused dashboard and utility assistant for Android AI Boxes.",
+  "requestFramePermissions": [
+    "geolocation",
+    "microphone"
+  ]
+}
